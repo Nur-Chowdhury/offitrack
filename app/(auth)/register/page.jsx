@@ -46,8 +46,6 @@ const page = () => {
                 try {
                     const response = await fetch(`/api/register?username=${formData.username}`);
                     const data = await response.json();
-                    console.log(data);
-
                     if (response.ok) {
                         if (data.available) {
                             setUsernameStatus({ loading: false, message: 'Username is available!', isAvailable: true });

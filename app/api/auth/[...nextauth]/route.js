@@ -12,23 +12,23 @@ export const authOptions = {
             password: { label: "Password", type: "password" },
         },
         async authorize(credentials) {
-            const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
+            const user = await prisma.User.findUnique({
+                where: { email: credentials.email },
             });
             if (!user) throw new Error("User not found");
 
             const isValid = await bcrypt.compare(
-            credentials.password,
-            user.password
+                credentials.password,
+                user.password
             );
             if (!isValid) throw new Error("Invalid credentials");
 
             return {
-            id: user.id.toString(),
-            name: user.name,
-            email: user.email,
-            username: user.username,
-            role: user.role,
+                id: user.id.toString(),
+                name: user.name,
+                email: user.email,
+                username: user.username,
+                role: user.role,
             };
         },
         }),
@@ -41,7 +41,9 @@ export const authOptions = {
     callbacks: {
         async session({ session, token }) {
         session.user = {
-            id: token.id,
+            id: token.id, 
+            name: token.name,
+            email: token.email,
             username: token.username,
             role: token.role ?? "user",
         };

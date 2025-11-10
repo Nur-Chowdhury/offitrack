@@ -1,14 +1,17 @@
-import { useSession } from "next-auth/react";
+import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { UserRole } from '@prisma/client';
 
 export async function POST(req) {
     try {
         const { name } = await req.json();
 
-        const {session} = useSession();
+        const session = await getServerSession(authOptions); 
 
         if (!session) {
             return Response.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        } 
 
         const userId = session.user.id;
 
@@ -30,6 +33,8 @@ export async function POST(req) {
         });
         return Response.json({ message: "New Organization Created!" }, { status: 201 });
     } catch (error) {
+        console.log(error);
+        
         return Response.json({ error: "Server error" }, { status: 500 });
     }
 }

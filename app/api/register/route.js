@@ -9,7 +9,7 @@ export async function POST(req) {
             return Response.json({ error: "Invalid input. Please Fillup all the field." }, { status: 400 });
         }
 
-        const existingUser = await prisma.user.findUnique({
+        const existingUser = await prisma.User.findUnique({
             where: { email: email }
         });
         if (existingUser) {
@@ -18,7 +18,7 @@ export async function POST(req) {
 
         const hashedPassword = await bcrypt.hash(password, 12);
 
-        const newUser = await prisma.user.create({
+        const newUser = await prisma.User.create({
             data: {
                 name: name,
                 email: email,
@@ -41,7 +41,7 @@ export async function GET(req) {
             return Response.json({ error: "Username query parameter is required." }, { status: 400 });
         }
 
-        const existingUser = await prisma.user.findUnique({
+        const existingUser = await prisma.User.findUnique({
             where: { username: username }
         });
 
@@ -51,6 +51,7 @@ export async function GET(req) {
             return Response.json({ available: true });
         }
     } catch (error) {
+        console.log(error);
         return Response.json({ error: "Server error" }, { status: 500 });
     }
 }

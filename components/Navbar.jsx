@@ -8,17 +8,16 @@ import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 import { signOut } from 'next-auth/react';
 import ThemeToggle from './ThemeToggle';
+import { Menu } from 'lucide-react';
 
-const Navbar = () => {
+const Navbar = ({ onMenuClick }) => {
 
     const { data: session, status } = useSession();
     const router = useRouter();
 
     const [isOpen, setIsOpen] = useState(false);
 
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-    };
+    const toggleDropdown = () => setIsOpen(!isOpen);
 
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -28,16 +27,16 @@ const Navbar = () => {
     }, [status, router]);
 
     return (
-        <nav className="w-full bg-white dark:bg-black flex justify-between items-center py-4 px-8 border-b border-slate-700 backdrop-blur-md fixed top-0 z-50">
+        <nav className="w-full bg-white dark:bg-black flex justify-between items-center py-4 px-8 border-b border-slate-300 dark:border-slate-700 backdrop-blur-md fixed top-0 z-50">
             <Link href="/" className="">
-            <Image 
-                src="/logo2.png"
-                alt="OffiTrack Logo"
-                width={80}
-                height={30}
-                priority
-                className=' text-blue-500'
-            />
+                <Image 
+                    src="/logo2.png"
+                    alt="OffiTrack Logo"
+                    width={80}
+                    height={30}
+                    priority
+                    className=' text-blue-500'
+                />
             </Link>
             <div className=' flex items-center gap-4'>
                 <ThemeToggle />
@@ -71,7 +70,13 @@ const Navbar = () => {
                         </div>
                     )}
                 </div>
-                
+                <button 
+                    onClick={onMenuClick} 
+                    className="lg:hidden text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                    aria-label="Open sidebar"
+                >
+                    <Menu size={24} />
+                </button>
             </div>
         </nav>
     )

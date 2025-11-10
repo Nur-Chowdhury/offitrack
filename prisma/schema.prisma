@@ -41,6 +41,10 @@ model User {
   createdAt DateTime @default(now()) 
   updatedAt DateTime @updatedAt
   memberships OrganizationMembership[]
+  userBookings Booking[]
+  reportedMaintenanceLogs MaintenanceLog[] @relation("ReportedBy")
+  maintainedLogs MaintenanceLog[] @relation("MaintainedBy")
+  assetAssignments AssetAssignment[]
 }
 
 model Organization {
@@ -49,6 +53,11 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   members OrganizationMembership[]
+  assets        Asset[]
+  resources     Resource[]
+  bookings      Booking[]
+  maintenanceLogs MaintenanceLog[]
+  notifications Notification[]
 }
 
 model OrganizationMembership {
@@ -59,6 +68,86 @@ model OrganizationMembership {
   organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   @@id([userId, organizationId])
+}
+
+model Asset {
+  id            String   @id @default(uuid())
+  name          String
+  type          String
+  purchaseDate  DateTime
+  condition     AssetCondition @default(GOOD)
+  qrCode        String   @unique
+  depreciationData String?
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  assignedToId  String
+  assignedTo    User    @relation(fields: [assignedToId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  maintenanceHistory MaintenanceLog[]
+  @@index([organizationId])
+}
+
+model Resource {
+  id          String   @id @default(uuid())
+  name        String
+  category    String
+  isAvailable Boolean  @default(true)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  bookings Booking[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([organizationId])
+}
+
+model Booking {
+  id        String        @id @default(uuid())
+  startTime DateTime
+  endTime   DateTime
+  status    BookingStatus @default(PENDING)
+  notes     String?
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  userId      String
+  user        User   @relation(fields: [userId], references: [id])
+  resourceId  String
+  resource    Resource @relation(fields: [resourceId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([organizationId])
+}
+
+model MaintenanceLog {
+  id                  String      @id @default(uuid())
+  details             String
+  cost                Float
+  nextMaintenanceDate DateTime?
+  isRepair            Boolean     @default(false)
+  organizationId      String
+  organization        Organization @relation(fields: [organizationId], references: [id])
+  assetId             String
+  asset               Asset   @relation(fields: [assetId], references: [id])
+  reportedById        String?
+  reportedBy          User?   @relation("ReportedBy", fields: [reportedById], references: [id])
+  maintainedById      String?
+  maintainedBy        User?   @relation("MaintainedBy", fields: [maintainedById], references: [id])
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  @@index([organizationId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  message   String
+  isRead    Boolean  @default(false)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  recipientId String
+  createdAt DateTime @default(now())
+  relatedBookingId    String?
+  relatedAssetId      String?
+  relatedMaintenanceId String?
+  @@index([organizationId, recipientId])
 }

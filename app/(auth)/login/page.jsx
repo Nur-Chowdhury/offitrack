@@ -20,7 +20,7 @@ const page = () => {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/dashboard");
+      router.replace("/dashboard"); 
     }
   }, [status, router]);
 

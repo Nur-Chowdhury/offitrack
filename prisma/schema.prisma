@@ -9,14 +9,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String   
-  username  String   @unique
-  email     String   @unique
-  password  String
-  role      String   @default("user") 
-  createdAt DateTime @default(now()) @map("created_at")
+enum UserRole {
+  ADMIN
+  EMPLOYEE
+  MAINTENANCE_STAFF
+}
 
-  @@map("users")
+enum AssetCondition {
+  NEW
+  GOOD
+  USED
+  DAMAGED
+  IN_REPAIR
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  IN_USE
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  memberships OrganizationMembership[]
+}
+
+model Organization {
+  id   String @id @default(uuid())
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  members OrganizationMembership[]
+}
+
+model OrganizationMembership {
+  role UserRole @default(EMPLOYEE)
+  userId         String
+  organizationId String
+  user           User         @relation(fields: [userId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([userId, organizationId])
 }

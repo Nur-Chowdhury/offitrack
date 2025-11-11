@@ -13,7 +13,7 @@ export async function POST(req) {
             return Response.json({ error: "Unauthorized" }, { status: 401 });
         } 
 
-        const userId = session.user.id;
+        const userId = session.user.id; 
 
         if (!name || typeof name !== 'string' || name.trim().length < 2) {
             return Response.json({ error: 'Organization name must be at least 3 characters long' }, { status: 400 });

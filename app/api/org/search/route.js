@@ -31,7 +31,7 @@ export async function GET(req) {
             orderBy: {
                 organization: {
                     name: 'asc',
-                },
+                }, 
             },
         });
 

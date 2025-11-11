@@ -2,18 +2,19 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ListChecks, Wrench, Users, Settings, BarChart } from 'lucide-react';
+import { Home, ListChecks, Wrench, Users, Settings, BarChart, Package } from 'lucide-react';
 import { Fragment } from 'react';
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose, changeIdx, idx }) => {
     const pathname = usePathname();
 
     const navItems = [
-        { href: `${pathname}`, label: 'Project Overview', icon: <Home size={18} /> },
-        { href: '#', label: 'Asset Management', icon: <ListChecks size={18} /> },
-        { href: '#', label: 'Maintenance', icon: <Wrench size={18} /> },
-        { href: '#', label: 'Users & Roles', icon: <Users size={18} /> },
-        { href: '#', label: 'Reports', icon: <BarChart size={18} /> },
+        { href: `${pathname}`, label: 'Project Overview', icon: <Home size={18} />, idx: 0 },
+        { href: '#', label: 'Users & Roles', icon: <Users size={18} />, idx: 1 },
+        { href: '#', label: 'Asset Management', icon: <ListChecks size={18} />, idx: 2 },
+        { href: '#', label: 'Resource Management', icon: <Package size={18} />, idx: 3 },
+        { href: '#', label: 'Maintenance', icon: <Wrench size={18} />, idx: 4 },
+        { href: '#', label: 'Reports', icon: <BarChart size={18} />, idx: 5 },
     ];
     
     return (
@@ -33,10 +34,14 @@ const Sidebar = ({ isOpen, onClose }) => {
                                 key={item.label}
                                 href={item.href}
                                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors
-                                    ${pathname === item.href 
+                                    ${idx === item.idx
                                         ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white' 
                                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'}`
                                     }
+                                onClick={() => {
+                                    changeIdx(item.idx);
+                                    onClose();
+                                }}
                             >
                                 {item.icon}
                                 <span>{item.label}</span>

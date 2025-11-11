@@ -32,6 +32,7 @@ enum BookingStatus {
   CANCELLED
 }
 
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -41,10 +42,10 @@ model User {
   createdAt DateTime @default(now()) 
   updatedAt DateTime @updatedAt
   memberships OrganizationMembership[]
+  assetAssignments AssetAssignment[]
   userBookings Booking[]
   reportedMaintenanceLogs MaintenanceLog[] @relation("ReportedBy")
   maintainedLogs MaintenanceLog[] @relation("MaintainedBy")
-  assetAssignments AssetAssignment[]
 }
 
 model Organization {
@@ -55,6 +56,7 @@ model Organization {
   members OrganizationMembership[]
   assets        Asset[]
   resources     Resource[]
+  assetAssignments AssetAssignment[]
   bookings      Booking[]
   maintenanceLogs MaintenanceLog[]
   notifications Notification[]
@@ -77,23 +79,41 @@ model Asset {
   type          String
   purchaseDate  DateTime
   condition     AssetCondition @default(GOOD)
-  qrCode        String   @unique
+  qrCode        String?   @unique
   depreciationData String?
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
-  assignedToId  String
-  assignedTo    User    @relation(fields: [assignedToId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   maintenanceHistory MaintenanceLog[]
+  assignments AssetAssignment[]
   @@index([organizationId])
+}
+
+model AssetAssignment {
+  id        String   @id @default(uuid())
+  assignedTime DateTime
+  returnedAt DateTime? 
+  notes     String?
+  status    BookingStatus @default(PENDING)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  assetId   String
+  asset     Asset    @relation(fields: [assetId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([organizationId])
+  @@index([assetId])
+  @@index([userId])
 }
 
 model Resource {
   id          String   @id @default(uuid())
   name        String
   category    String
-  isAvailable Boolean  @default(true)
+  quantity    Int      @default(1)
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
   bookings Booking[]
@@ -148,6 +168,6 @@ model Notification {
   createdAt DateTime @default(now())
   relatedBookingId    String?
   relatedAssetId      String?
-  relatedMaintenanceId String?
+  relatedMaintenanceId String? 
   @@index([organizationId, recipientId])
 }

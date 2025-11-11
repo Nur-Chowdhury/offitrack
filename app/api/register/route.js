@@ -43,7 +43,7 @@ export async function GET(req) {
 
         const existingUser = await prisma.User.findUnique({
             where: { username: username }
-        });
+        }); 
 
         if (existingUser) {
             return Response.json({ available: false });

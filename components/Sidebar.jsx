@@ -1,20 +1,21 @@
-"use client"
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { Home, ListChecks, Wrench, Users, Settings, BarChart, Package } from 'lucide-react';
 import { Fragment } from 'react';
+import Link from 'next/link';
 
-const Sidebar = ({ isOpen, onClose, changeIdx, idx }) => {
-    const pathname = usePathname();
+// The props have been updated:
+// - `onViewChange` is the function to call when a button is clicked.
+// - `activeIdx` is the currently active index, read from the URL in the parent.
+const Sidebar = ({ isOpen, onClose, onViewChange, activeIdx }) => {
 
     const navItems = [
-        { href: `${pathname}`, label: 'Project Overview', icon: <Home size={18} />, idx: 0 },
-        { href: '#', label: 'Users & Roles', icon: <Users size={18} />, idx: 1 },
-        { href: '#', label: 'Asset Management', icon: <ListChecks size={18} />, idx: 2 },
-        { href: '#', label: 'Resource Management', icon: <Package size={18} />, idx: 3 },
-        { href: '#', label: 'Maintenance', icon: <Wrench size={18} />, idx: 4 },
-        { href: '#', label: 'Reports', icon: <BarChart size={18} />, idx: 5 },
+        { label: 'Overview', icon: <Home size={18} />, idx: 0 },
+        { label: 'Members', icon: <Users size={18} />, idx: 1 },
+        { label: 'Asset Management', icon: <ListChecks size={18} />, idx: 2 },
+        { label: 'Resource Booking', icon: <Package size={18} />, idx: 3 },
+        { label: 'Maintenance', icon: <Wrench size={18} />, idx: 4 },
+        { label: 'Reports', icon: <BarChart size={18} />, idx: 5 },
     ];
     
     return (
@@ -30,28 +31,30 @@ const Sidebar = ({ isOpen, onClose, changeIdx, idx }) => {
                 <div className="p-4">
                     <nav className="flex flex-col gap-1">
                         {navItems.map((item) => (
-                            <Link 
+                            // Changed from <Link> to <button> because this action changes state on the current page,
+                            // rather than navigating to a new one. This is better for accessibility.
+                            <button 
                                 key={item.label}
-                                href={item.href}
-                                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors
-                                    ${idx === item.idx
+                                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full text-left
+                                    ${activeIdx === item.idx // Use the new `activeIdx` prop for styling
                                         ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white' 
                                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'}`
                                     }
                                 onClick={() => {
-                                    changeIdx(item.idx);
-                                    onClose();
+                                    onViewChange(item.idx); // Call the new handler from the parent page
+                                    onClose(); // This still closes the sidebar on mobile after a selection
                                 }}
                             >
                                 {item.icon}
                                 <span>{item.label}</span>
-                            </Link>
+                            </button>
                         ))}
                     </nav>
 
                     <div className="absolute bottom-4 w-full pr-8">
+                        {/* A true link to a different page (like a settings page) should remain a <Link> */}
                         <Link 
-                            href="#"
+                            href="#" // You can change this to a real settings page later
                             className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
                         >
                             <Settings size={18} />
@@ -61,7 +64,6 @@ const Sidebar = ({ isOpen, onClose, changeIdx, idx }) => {
                 </div>
             </aside>
         </Fragment>
-        
     );
 }
 

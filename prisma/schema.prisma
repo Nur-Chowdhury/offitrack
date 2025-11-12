@@ -32,6 +32,17 @@ enum BookingStatus {
   CANCELLED
 }
 
+enum ResourceType {
+  PHYSICAL
+  VIRTUAL
+}
+
+enum MaintenanceStatus {
+  REPORTED
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+}
 
 model User {
   id        String   @id @default(uuid())
@@ -92,7 +103,7 @@ model Asset {
 
 model AssetAssignment {
   id        String   @id @default(uuid())
-  assignedTime DateTime
+  assignedTime DateTime?
   returnedAt DateTime? 
   notes     String?
   status    BookingStatus @default(PENDING)
@@ -114,9 +125,14 @@ model Resource {
   name        String
   category    String
   quantity    Int      @default(1)
+  type           ResourceType @default(PHYSICAL)
+  location       String?
+  url            String?
+  condition      AssetCondition @default(GOOD)
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
   bookings Booking[]
+  maintenanceHistory MaintenanceLog[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   @@index([organizationId])
@@ -142,13 +158,17 @@ model Booking {
 model MaintenanceLog {
   id                  String      @id @default(uuid())
   details             String
-  cost                Float
+  cost                Float?
+  status              MaintenanceStatus @default(REPORTED)
+  completedAt         DateTime?
   nextMaintenanceDate DateTime?
   isRepair            Boolean     @default(false)
   organizationId      String
   organization        Organization @relation(fields: [organizationId], references: [id])
-  assetId             String
-  asset               Asset   @relation(fields: [assetId], references: [id])
+  resourceId          String?
+  resource            Resource?   @relation(fields: [resourceId], references: [id])
+  assetId             String?
+  asset               Asset?   @relation(fields: [assetId], references: [id])
   reportedById        String?
   reportedBy          User?   @relation("ReportedBy", fields: [reportedById], references: [id])
   maintainedById      String?

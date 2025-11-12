@@ -41,7 +41,6 @@ export async function GET(req) {
         }));        
         return Response.json(organizationsWithRoles, { status: 200 });
     } catch (error) {
-        console.log(error);
         return Response.json({ error: "Server error" }, { status: 500 });
     }
 }

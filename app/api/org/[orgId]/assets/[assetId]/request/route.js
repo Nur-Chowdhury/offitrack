@@ -8,10 +8,13 @@ export async function POST(request, context) {
     if (error) {
         return Response.json({ error }, { status });
     }
+<<<<<<< HEAD
     const asset = await prisma.asset.findUnique({ where: { id: assetId } });
     if (asset.condition !== 'GOOD' && asset.condition !== 'NEW' && asset.condition !== 'USED') {
         return Response.json({ error: `This asset is currently ${asset.condition.toLowerCase()} and cannot be requested.` }, { status: 409 });
     }
+=======
+>>>>>>> e643804e5c0b88c93164af61552be386712ec400
     try {
         const { notes } = await request.json();
         const isAdmin = membership.role === UserRole.ADMIN;

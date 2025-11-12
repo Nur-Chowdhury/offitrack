@@ -1,5 +1,6 @@
 "use client";
 
+<<<<<<< HEAD
 import Navbar from '@/components/Navbar';
 import Overview from '@/components/Overview';
 import Sidebar from '@/components/Sidebar';
@@ -9,6 +10,15 @@ import ResourceList from '@/components/ResourceList';
 import MaintenanceDashboard from '@/components/MaintenanceDashboard';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
+=======
+import AssetList from '@/components/AssetList';
+import Navbar from '@/components/Navbar'
+import Overview from '@/components/Overview';
+import Sidebar from '@/components/Sidebar';
+import UserList from '@/components/UserList';
+import { useParams } from 'next/navigation';
+import React, { useState } from 'react'
+>>>>>>> e643804e5c0b88c93164af61552be386712ec400
 
 const viewMap = {
     overview: 0,
@@ -29,6 +39,7 @@ const Page = () => {
     const orgName = "Image Storage";
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+<<<<<<< HEAD
     
     const currentView = searchParams.get('view') || 'overview';
     const idx = viewMap[currentView] ?? 0;
@@ -43,13 +54,20 @@ const Page = () => {
     if (!orgId) {
         return <div className="pt-24 text-center">Loading Organization...</div>;
     }
+=======
+    const [idx, setIdx] = useState(0);    
+>>>>>>> e643804e5c0b88c93164af61552be386712ec400
 
     return (
         <div className=" min-h-screen">
             <Navbar 
                 onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
             />
+<<<<<<< HEAD
             <div className='w-full flex'>
+=======
+            <div className=' w-full flex'>
+>>>>>>> e643804e5c0b88c93164af61552be386712ec400
                 <Sidebar 
                     isOpen={isSidebarOpen} 
                     onClose={() => setIsSidebarOpen(false)}
@@ -57,11 +75,17 @@ const Page = () => {
                     activeIdx={idx}
                 />
                 <main className="w-full lg:ml-64 pt-24">
+<<<<<<< HEAD
                     {idx === 0 && <Overview orgId={orgId} orgName={orgName} />}
                     {idx === 1 && <UserList orgId={orgId}/>}
                     {idx === 2 && <AssetList orgId={orgId}/>}
                     {idx === 3 && <ResourceList orgId={orgId} />}
                     {idx === 4 && <MaintenanceDashboard orgId={orgId} />}
+=======
+                    {idx===0 && <Overview orgId={orgId} orgName={orgName} />}
+                    {idx===1 && <UserList orgId={orgId}/>}
+                    {idx===2 && <AssetList orgId={orgId}/>}
+>>>>>>> e643804e5c0b88c93164af61552be386712ec400
                 </main>
             </div>
         </div>

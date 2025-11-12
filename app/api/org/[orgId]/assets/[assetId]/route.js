@@ -2,8 +2,8 @@ import { authorizeAndGetMembership } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 
-export async function GET(req, { params }) {
-    const { orgId, assetId } = params;
+export async function GET(req, context) {
+    const { orgId, assetId } = await context.params;
     const { error, status } = await authorizeAndGetMembership(orgId);
     if (error) {
         return Response.json({ error }, { status });
@@ -23,8 +23,8 @@ export async function GET(req, { params }) {
     }
 }
 
-export async function PUT(req, { params }) {
-    const { orgId, assetId } = params;
+export async function PUT(req, context) {
+    const { orgId, assetId } = await context.params;
     const { error, status, membership } = await authorizeAndGetMembership(orgId);
     if (error) {
         return Response.json({ error }, { status });
@@ -35,7 +35,7 @@ export async function PUT(req, { params }) {
     try {
         const body = await req.json();
         const updatedAsset = await prisma.asset.update({
-            where: { id: assetId },
+            where: { id: assetId, organizationId: orgId },
             data: { ...body }
         });
         return Response.json(updatedAsset, { status: 200 });
@@ -44,8 +44,8 @@ export async function PUT(req, { params }) {
     }
 }
 
-export async function DELETE(req, { params }) {
-    const { orgId, assetId } = params;
+export async function DELETE(req, context) {
+    const { orgId, assetId } = await context.params;
     const { error, status, membership } = await authorizeAndGetMembership(orgId);
 
     if (error) {

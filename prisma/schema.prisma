@@ -92,7 +92,7 @@ model Asset {
 
 model AssetAssignment {
   id        String   @id @default(uuid())
-  assignedTime DateTime
+  assignedTime DateTime?
   returnedAt DateTime? 
   notes     String?
   status    BookingStatus @default(PENDING)

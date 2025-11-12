@@ -44,7 +44,6 @@ export async function PUT(req, context) {
         });
         return Response.json(updatedMembership, { status: 200 });
     } catch (e) {
-        console.error(e);
         return Response.json({ error: "Failed to update member role. Member may not exist." }, { status: 404 });
     }
 }

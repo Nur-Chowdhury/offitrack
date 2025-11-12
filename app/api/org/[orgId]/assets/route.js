@@ -2,8 +2,8 @@ import { authorizeAndGetMembership } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 
-export async function GET(req, { params }) {
-    const { orgId } = params;
+export async function GET(req, context) {
+    const { orgId } = await context.params;
     const { error, status } = await authorizeAndGetMembership(orgId);
 
     if (error) {
@@ -11,15 +11,8 @@ export async function GET(req, { params }) {
     }
 
     try {
-        const { searchParams } = new URL(req.url);
-        const page = parseInt(searchParams.get('page') || '1');
-        const limit = parseInt(searchParams.get('limit') || '10');
-        const skip = (page - 1) * limit;
-
         const assets = await prisma.asset.findMany({
             where: { organizationId: orgId },
-            skip,
-            take: limit,
             orderBy: { createdAt: 'desc' }
         });
 
@@ -29,8 +22,8 @@ export async function GET(req, { params }) {
     }
 }
 
-export async function POST(req, { params }) {
-    const { orgId } = params;
+export async function POST(req, context) {
+    const { orgId } = await context.params;
     const { error, status, membership } = await authorizeAndGetMembership(orgId);
 
     if (error) {
@@ -44,6 +37,10 @@ export async function POST(req, { params }) {
     try {
         const body = await req.json();
         const { name, type, purchaseDate, condition } = body;
+
+        if (!name || !type || !purchaseDate || !condition) {
+            return Response.json({ error: "Missing required fields" }, { status: 400 });
+        }
 
         const newAsset = await prisma.asset.create({
             data: {

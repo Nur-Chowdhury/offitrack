@@ -33,8 +33,6 @@ export async function POST(req) {
         });
         return Response.json({ message: "New Organization Created!" }, { status: 201 });
     } catch (error) {
-        console.log(error);
-        
         return Response.json({ error: "Server error" }, { status: 500 });
     }
 }

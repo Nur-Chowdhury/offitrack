@@ -51,7 +51,6 @@ export async function GET(req) {
             return Response.json({ available: true });
         }
     } catch (error) {
-        console.log(error);
         return Response.json({ error: "Server error" }, { status: 500 });
     }
 }

@@ -2,8 +2,8 @@ import { authorizeAndGetMembership } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { UserRole, BookingStatus } from "@prisma/client";
 
-export async function POST(req, { params }) {
-    const { orgId, assetId } = params;
+export async function POST(req, context) {
+    const { orgId, assetId } = await context.params;
     const { error, status, membership } = await authorizeAndGetMembership(orgId);
 
     if (error) {

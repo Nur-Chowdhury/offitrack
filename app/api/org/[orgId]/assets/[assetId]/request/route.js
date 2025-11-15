@@ -1,6 +1,7 @@
 import { authorizeAndGetMembership } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { BookingStatus, UserRole } from "@prisma/client";
+import { createNotification, createNotificationForAdmins } from "@/lib/notifications";
 
 export async function POST(request, context) {
     const { orgId, assetId } = await context.params;
@@ -15,6 +16,7 @@ export async function POST(request, context) {
     try {
         const { notes } = await request.json();
         const isAdmin = membership.role === UserRole.ADMIN;
+        console.log(notes, isAdmin, orgId, assetId);
         if (isAdmin) {
             const result = await prisma.$transaction(async (tx) => {
                 const adminAssignment = await tx.assetAssignment.create({
@@ -26,7 +28,7 @@ export async function POST(request, context) {
                         status: BookingStatus.APPROVED,
                         assignedTime: new Date(),
                     }
-                });
+                }); 
                 await tx.assetAssignment.updateMany({
                     where: {
                         assetId: assetId,
@@ -38,6 +40,7 @@ export async function POST(request, context) {
                 });
                 return adminAssignment;
             });
+            console.log(result);
             return Response.json(result, { status: 201 });
         }
         const newAssignmentRequest = await prisma.assetAssignment.create({
@@ -49,6 +52,14 @@ export async function POST(request, context) {
                 status: BookingStatus.PENDING,
             }
         });
+        if (!isAdmin) {
+            await createNotificationForAdmins(
+                prisma,
+                orgId,
+                `${membership.name} has requested the asset: ${asset.name}.`,
+                { relatedAssetId: assetId }
+            );
+        }
         return Response.json(newAssignmentRequest, { status: 201 });
     } catch (error) {
         return Response.json({ error: "Server error" }, { status: 500 });

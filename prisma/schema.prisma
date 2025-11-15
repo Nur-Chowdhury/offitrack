@@ -81,6 +81,7 @@ model OrganizationMembership {
   organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  lastSeenNotificationsAt DateTime?
   @@id([userId, organizationId])
 }
 
@@ -89,6 +90,7 @@ model Asset {
   name          String
   type          String
   purchaseDate  DateTime
+  warrantyExpiry DateTime?
   condition     AssetCondition @default(GOOD)
   qrCode        String?   @unique
   depreciationData String?

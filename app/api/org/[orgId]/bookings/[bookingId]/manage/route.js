@@ -1,6 +1,6 @@
 import { authorizeAndGetMembership } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { UserRole, BookingStatus } from "@prisma/client";
+import { UserRole, BookingStatus } from "@prisma/client"; 
 
 export async function PUT(request, context) {
     const { orgId, bookingId } = await context.params;
@@ -26,6 +26,15 @@ export async function PUT(request, context) {
             where: { id: bookingId },
             data: { status: newStatus }
         });
+        if (newStatus === BookingStatus.APPROVED) {
+            await createNotification(prisma, orgId, updatedBooking.userId, `Your booking for "${itemName}" has been approved.`, { relatedBookingId: updatedBooking.id });
+        } else if (newStatus === BookingStatus.REJECTED) {
+            await createNotification(prisma, orgId, updatedBooking.userId, `Your booking for "${itemName}" has been rejected.`);
+        } else if (newStatus === BookingStatus.CANCELLED) {
+            if (isAdmin && !isOwner) {
+                await createNotification(prisma, orgId, updatedBooking.userId, `Your booking for "${itemName}" was cancelled by an administrator.`);
+            }
+        }
         return Response.json(updatedBooking, { status: 200 });
     } catch (e) {
         return Response.json({ error: "Operation failed." }, { status: 500 });

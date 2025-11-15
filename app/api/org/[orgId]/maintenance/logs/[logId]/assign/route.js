@@ -1,6 +1,7 @@
 import { authorizeAndGetMembership } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { UserRole, MaintenanceStatus, AssetCondition } from "@prisma/client";
+import { createNotification } from "@/lib/notifications";
 
 export async function PUT(request, context) {
     const { orgId, logId } = await context.params;
@@ -30,7 +31,21 @@ export async function PUT(request, context) {
                 }
             });
         });
-
+        await createNotification(
+            prisma, 
+            orgId, 
+            staffId, 
+            `You have been assigned a new maintenance task for: ${itemName}.`, 
+            { relatedMaintenanceId: logId }
+        );
+        if (logToUpdate.reportedById) {
+            await createNotification(
+                prisma, 
+                orgId, 
+                logToUpdate.reportedById, 
+                `Maintenance for "${itemName}" has been assigned to a staff member.`
+            );
+        }
         return Response.json(updatedLog, { status: 200 });
     } catch (e) {
         return Response.json({ error: "Failed to assign staff." }, { status: 500 });

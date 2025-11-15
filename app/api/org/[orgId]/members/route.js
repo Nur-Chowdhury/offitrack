@@ -1,4 +1,5 @@
 import { authorizeAndGetMembership } from "@/lib/auth";
+import { createNotification } from "@/lib/notifications";
 import prisma from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 
@@ -21,7 +22,6 @@ export async function GET(request, context) {
             }
         }
     });
-
     return Response.json(members, { status: 200 });
 }
 
@@ -51,6 +51,12 @@ export async function POST(req, context) {
                 role: role || UserRole.EMPLOYEE,
             }
         });
+        await createNotification(
+            prisma,
+            orgId,
+            userToAdd.id,
+            `Welcome to the organization! You have been added as a ${role || 'EMPLOYEE'}.`
+        );
         return Response.json(newMember, { status: 201 });
 
     } catch(e) {

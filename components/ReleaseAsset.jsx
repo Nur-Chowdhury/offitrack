@@ -6,7 +6,8 @@ const ReleaseAsset = ({ isOpen, onClose, onSuccess, orgId, assignment }) => {
     const [condition, setCondition] = useState('GOOD');
     const [isReleasing, setIsReleasing] = useState(false);
     
-
+    console.log(assignment);
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsReleasing(true);

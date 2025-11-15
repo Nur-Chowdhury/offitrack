@@ -1,6 +1,7 @@
 import { authorizeAndGetMembership } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { AssetCondition, BookingStatus } from "@prisma/client";
+import { createNotification, createNotificationForAdmins } from "@/lib/notifications";
 
 export async function POST(request, context) {
     const { orgId } = await context.params;
@@ -15,16 +16,32 @@ export async function POST(request, context) {
 
         const newLog = await prisma.$transaction(async (tx) => {
             if (assetId) {
-                await tx.asset.update({ where: { id: assetId }, data: { condition: AssetCondition.DAMAGED } });
-                await tx.assetAssignment.deleteMany({
-                    where: { assetId: assetId, status: { in: [BookingStatus.PENDING, BookingStatus.APPROVED, BookingStatus.IN_USE] } }
-                });
+                const asset = await tx.asset.update({ where: { id: assetId }, data: { condition: AssetCondition.DAMAGED } });
+                itemName = asset.name;
+                const assignmentsToCancel = await tx.assetAssignment.findMany({ where: { assetId, status: { in: ['APPROVED', 'IN_USE'] } } });
+                for (const assignment of assignmentsToCancel) {
+                    await createNotification(
+                        tx, 
+                        orgId, 
+                        assignment.userId, 
+                        `Your assignment for "${itemName}" has been cancelled because the item was reported as damaged.`
+                    );
+                }
+                await tx.assetAssignment.deleteMany({ where: { assetId, status: { in: ['PENDING', 'APPROVED', 'IN_USE'] } } });
             }
             if (resourceId) {
-                await tx.resource.update({ where: { id: resourceId }, data: { condition: AssetCondition.DAMAGED } });
-                await tx.booking.deleteMany({
-                    where: { resourceId: resourceId, status: { in: [BookingStatus.PENDING, BookingStatus.APPROVED, BookingStatus.IN_USE] } }
-                });
+                const resource = await tx.resource.update({ where: { id: resourceId }, data: { condition: AssetCondition.DAMAGED } });
+                itemName = resource.name;
+                const bookingsToCancel = await tx.booking.findMany({ where: { resourceId, status: { in: ['APPROVED', 'IN_USE'] } } });
+                for (const booking of bookingsToCancel) {
+                    await createNotification(
+                        tx, 
+                        orgId, 
+                        booking.userId, 
+                        `Your booking for "${itemName}" has been cancelled because the item was reported as damaged.`
+                    );
+                }
+                await tx.booking.deleteMany({ where: { resourceId, status: { in: ['PENDING', 'APPROVED', 'IN_USE'] } } });
             }
             const maintenanceData = {
                 details,
@@ -45,7 +62,13 @@ export async function POST(request, context) {
                     connect: { id: resourceId }
                 };
             }
-
+            await createNotificationForAdmins(
+                tx, 
+                orgId, 
+                `A new maintenance issue was reported for: ${itemName}.`, 
+                { relatedMaintenanceId: log.id }
+            );
+            
             return tx.maintenanceLog.create({
                 data: maintenanceData
             });

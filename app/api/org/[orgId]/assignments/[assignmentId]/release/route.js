@@ -4,6 +4,7 @@ import { BookingStatus, UserRole, AssetCondition  } from "@prisma/client";
 
 export async function PUT(request, context) {
     const { orgId, assignmentId } = await context.params;
+    
     const { error, status, membership } = await authorizeAndGetMembership(orgId);
     if (error) {
         return Response.json({ error }, { status });

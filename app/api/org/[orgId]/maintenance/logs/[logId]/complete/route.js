@@ -1,6 +1,7 @@
 import { authorizeAndGetMembership } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { UserRole, MaintenanceStatus, AssetCondition } from "@prisma/client";
+import { createNotification, createNotificationForAdmins } from "@/lib/notifications";
 
 export async function PUT(request, context) {
     const { orgId, logId } = await context.params;
@@ -24,6 +25,15 @@ export async function PUT(request, context) {
             if (logToComplete.resourceId) {
                 await tx.resource.update({ where: { id: logToComplete.resourceId }, data: { condition: AssetCondition.GOOD } });
             }
+            if (logToComplete.reportedById) {
+                await createNotification(tx, orgId, logToComplete.reportedById, `The maintenance issue for "${itemName}" has been resolved.`);
+            }
+            await createNotificationForAdmins(
+                tx, 
+                orgId, 
+                `The maintenance issue for "${itemName}" has been resolved.`, 
+                { relatedMaintenanceId: logToComplete.id }
+            );
             return tx.maintenanceLog.update({
                 where: { id: logId },
                 data: {

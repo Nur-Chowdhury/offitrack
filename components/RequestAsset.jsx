@@ -14,7 +14,7 @@ const RequestAsset = ({ isOpen, onClose, onSuccess, orgId, asset, isAdmin }) => 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ notes }),
-            });
+            }); 
             if (!response.ok) {
                 const err = await response.json(); throw new Error(err.error);
             }

@@ -1,6 +1,7 @@
 import { authorizeAndGetMembership } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { BookingStatus, UserRole } from "@prisma/client";
+import { createNotificationForAdmins } from "@/lib/notifications";
 
 export async function GET(request, context) {
     const { orgId } = await context.params;
@@ -61,6 +62,14 @@ export async function POST(request, context) {
                 status: bookingStatus,
             }
         });
+        if (!isAdmin) {
+            await createNotificationForAdmins(
+                prisma,
+                orgId,
+                `${membership.name} has requested the resource: ${resource.name}.`,
+                { relatedAssetId: resourceId }
+            );
+        }
         return Response.json(newBooking, { status: 201 });
     } catch (error) {
         return Response.json({ error: "Invalid data" }, { status: 400 });

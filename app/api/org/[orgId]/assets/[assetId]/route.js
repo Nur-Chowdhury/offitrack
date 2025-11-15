@@ -46,6 +46,8 @@ export async function PUT(req, context) {
 
 export async function DELETE(req, context) {
     const { orgId, assetId } = await context.params;
+    console.log(orgId, assetId);
+    
     const { error, status, membership } = await authorizeAndGetMembership(orgId);
 
     if (error) {
@@ -56,11 +58,23 @@ export async function DELETE(req, context) {
     }
 
     try {
-        await prisma.asset.delete({
-            where: { id: assetId, organizationId: orgId }
+        await prisma.$transaction(async (tx) => {
+            await tx.assetAssignment.deleteMany({
+                where: { assetId: assetId },
+            });
+
+            await tx.maintenanceLog.deleteMany({
+                where: { assetId: assetId },
+            });
+
+            await tx.asset.delete({
+                where: { id: assetId, organizationId: orgId },
+            });
         });
         return Response.json({ message: "Asset deleted successfully" }, { status: 200 });
     } catch (e) {
+        console.log(e);
+        
         return Response.json({ error: "Asset not found" }, { status: 404 });
     }
 }

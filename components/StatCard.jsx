@@ -4,18 +4,18 @@ import { BarChart, Bar, ResponsiveContainer, Tooltip } from 'recharts';
 
 const StatCard = ({ title, metricName, value, icon, color = '#22c55e', chartData = [] }) => {
     return (
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-5 flex flex-col justify-between hover:border-gray-700 transition-colors duration-300">
+        <div className="bg-gray-200 dark:bg-gray-900 border border-gray-800 dark:border-gray-200 rounded-lg p-5 flex flex-col justify-between hover:border-gray-700 transition-colors duration-300">
             <div>
-                <div className="flex items-center gap-3 text-gray-400">
+                <div className="flex items-center gap-3">
                     {icon}
-                    <h3 className="font-semibold text-white">
+                    <h3 className="font-semibold">
                         {title}
                     </h3>
                 </div>
-                <p className="text-sm text-gray-500 mt-4">
+                <p className="text-sm mt-4">
                     {metricName}
                 </p>
-                <p className="text-5xl font-bold text-white mt-1">
+                <p className="text-5xl font-bold mt-1">
                     {value}
                 </p>
             </div>

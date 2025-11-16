@@ -1,36 +1,65 @@
-"use client"
+"use client";
 
 import Navbar from "@/components/Navbar";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, ChevronRight } from "lucide-react";
 import CreateOrg from "@/components/CreateOrg";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { useUnseenNotifications } from "@/hooks/useUnseenNotifications";
+
+const OrganizationCard = ({ org }) => {
+  const { count } = useUnseenNotifications(org.id);
+  return (
+    <Link href={`/dashboard/org/${org.id}`} className="group block">
+      <div
+        className=" w-[250px] p-4 border rounded-lg shadow-sm transition-all duration-200 dark:bg-gray-950 dark:border-gray-700
+                hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-md dark:shadow-gray-500"
+      >
+        <div className=" flex justify-between">
+          <h3 className="font-semibold">{org.name}</h3>
+          <ChevronRight
+            size={24}
+            className="transition-transform duration-200 ease-in-out group-hover:translate-x-1 group-hover:scale-125"
+          />
+        </div>
+        <span className=" text-sm text-gray-700 dark:text-gray-300">
+          Role: {org.role}
+        </span>
+        <div className="w-full mt-4 text-center text-md text-blue-500 font-semibold">
+          {count} New Notifications
+        </div>
+      </div>
+    </Link>
+  );
+};
 
 const page = () => {
-
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [organizations, setOrganizations] = useState([]);
   const [create, setCreate] = useState(false);
 
-
-  const fetchOrganizations = async () => {
+  const fetchOrganizations  = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await fetch(`/api/org/search?search=${encodeURIComponent(searchTerm)}`);
-      if (response.ok) {
-        const data = await response.json();
-        setOrganizations(data);
-      }
+      const response = await fetch(
+        `/api/org/search?search=${encodeURIComponent(searchTerm)}`
+      );
+      if (!response.ok)
+        throw new Error("Failed to fetch initial organization data.");
+      const orgs = await response.json();
+      setOrganizations(orgs);
     } catch (error) {
-      console.error("Error fetching organizations:", error);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
-  
+
   useEffect(() => {
-    fetchOrganizations();
+    const debounceTimer = setTimeout(() => fetchOrganizations(), 300);
+    return () => clearTimeout(debounceTimer);
   }, [searchTerm]);
 
   if (loading) {
@@ -42,11 +71,9 @@ const page = () => {
   }
 
   const handleCreationSuccess = () => {
-    toast.success('Organization created successfully!');
+    toast.success("Organization created successfully!");
     fetchOrganizations();
   };
-
-  console.log(organizations);
 
   return (
     <div className="">
@@ -63,7 +90,8 @@ const page = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button className=" px-2 py-0.5 bg-green-700 hover:bg-green-600 text-sm rounded-lg cursor-pointer flex items-center
+          <button
+            className=" px-2 py-0.5 bg-green-700 hover:bg-green-600 text-sm rounded-lg cursor-pointer flex items-center
            justify-center gap-0.5 font-medium"
             onClick={() => setCreate(true)}
           >
@@ -72,27 +100,15 @@ const page = () => {
           </button>
         </div>
         {organizations.length === 0 ? (
-          <p className=" mt-8 text-gray-500 text-center">No organizations found.</p>
+          <p className=" mt-8 text-gray-500 text-center">
+            No organizations found.
+          </p>
         ) : (
           <div className="mt-4 flex flex-wrap gap-4">
             {organizations.map((org) => (
-              <Link
-                href={`/dashboard/org/${org.id}`}
-                key={org.id}
-                className="group block"
-              >
-                <div key={org.id} className=" w-[250px] p-4 border rounded-lg shadow-sm transition-all duration-200 dark:bg-gray-950 dark:border-gray-700
-                hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-md dark:shadow-gray-500">
-                  <div className=" flex justify-between">
-                    <h3 className="font-semibold">{org.name}</h3>
-                    <ChevronRight size={24} className="transition-transform duration-200 ease-in-out group-hover:translate-x-1 group-hover:scale-125"/>
-                  </div>
-                  <span className=" text-sm text-gray-700 dark:text-gray-300">Role: {org.role}</span>
-                </div>
-              </Link>
+              <OrganizationCard org={org} key={org.id} />
             ))}
           </div>
-
         )}
       </div>
       <CreateOrg
@@ -100,7 +116,7 @@ const page = () => {
         onClose={() => setCreate(false)}
         onSuccess={handleCreationSuccess}
       />
-    </div> 
+    </div>
   );
 };
 

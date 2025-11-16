@@ -23,11 +23,14 @@ const NotificationModal = ({ isOpen, onClose, orgId }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // --- THIS LOGIC IS NOW SIMPLIFIED ---
         if (isOpen && orgId) {
-            const fetchAndMarkSeen = async () => {
+            const fetchNotifications = async () => {
                 setLoading(true);
                 try {
-                    await fetch(`/api/org/${orgId}/notifications/mark-seen`, { method: 'PUT' });
+                    // The modal's only job now is to FETCH the notification list.
+                    // The "mark-seen" action is handled by the parent component (`Overview`)
+                    // when the modal is closed, which is a more robust pattern.
                     const response = await fetch(`/api/org/${orgId}/notifications`);
                     if (!response.ok) throw new Error("Failed to fetch notifications.");
                     setNotifications(await response.json());
@@ -37,17 +40,18 @@ const NotificationModal = ({ isOpen, onClose, orgId }) => {
                     setLoading(false);
                 }
             };
-            fetchAndMarkSeen();
+            fetchNotifications();
         }
     }, [isOpen, orgId]);
 
     if (!isOpen) return null;
+
     const getIcon = (message) => {
         if (message.toLowerCase().includes('approved')) return <ListChecks className="text-green-500"/>;
-        if (message.toLowerCase().includes('rejected')) return <X className="text-red-500"/>;
-        if (message.toLowerCase().includes('maintenance')) return <Wrench className="text-orange-500"/>;
+        if (message.toLowerCase().includes('rejected') || message.toLowerCase().includes('cancelled')) return <X className="text-red-500"/>;
+        if (message.toLowerCase().includes('maintenance') || message.toLowerCase().includes('damaged')) return <Wrench className="text-orange-500"/>;
         if (message.toLowerCase().includes('welcome')) return <UserPlus className="text-indigo-500"/>;
-        if (message.toLowerCase().includes('requested')) return <Package className="text-blue-500"/>;
+        if (message.toLowerCase().includes('requested') || message.toLowerCase().includes('assigned')) return <Package className="text-blue-500"/>;
         return <Bell className="text-gray-400"/>;
     };
 
@@ -56,20 +60,25 @@ const NotificationModal = ({ isOpen, onClose, orgId }) => {
             <div className="relative w-full max-w-lg p-6 bg-white rounded-lg shadow-xl dark:bg-gray-800" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-start justify-between pb-4 border-b dark:border-gray-600">
                     <h3 className="text-xl font-semibold">Notifications</h3>
-                    <button type="button" onClick={onClose}><X size={20} /></button>
+                    <button type="button" onClick={onClose} className="p-1.5 text-gray-400 hover:text-gray-800 dark:hover:text-white"><X size={20} /></button>
                 </div>
                 <div className="mt-4 max-h-[60vh] overflow-y-auto">
                     {loading ? (
-                        <p className="text-center text-gray-500 py-4">Loading...</p>
+                        <div className="text-center text-gray-500 py-4">
+                            <p>Loading notifications...</p>
+                        </div>
                     ) : notifications.length === 0 ? (
-                        <p className="text-center text-gray-500 py-8">You have no new notifications.</p>
+                        <div className="text-center text-gray-500 py-8">
+                            <Bell size={32} className="mx-auto mb-2"/>
+                            <p>You have no notifications.</p>
+                        </div>
                     ) : (
-                        <ul className="space-y-3">
+                        <ul className="space-y-2">
                             {notifications.map(notif => (
                                 <li key={notif.id} className="p-3 flex items-start gap-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <div className="flex-shrink-0 mt-1">{getIcon(notif.message)}</div>
                                     <div>
-                                        <p className="text-sm">{notif.message}</p>
+                                        <p className="text-sm text-gray-800 dark:text-gray-200">{notif.message}</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatTimeAgo(notif.createdAt)}</p>
                                     </div>
                                 </li>

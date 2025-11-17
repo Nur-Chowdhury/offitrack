@@ -2,7 +2,6 @@ import { authorizeAndGetMembership } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { UserRole, BookingStatus } from "@prisma/client";
 import { createNotification } from "@/lib/notifications";
-import { createNotification } from "@/lib/notifications";
 
 export async function PUT(request, context) {
     const { orgId, assignmentId } = await context.params;

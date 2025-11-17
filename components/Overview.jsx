@@ -43,7 +43,6 @@ const Overview = ({ orgId }) => {
                 });
 
             } catch (error) {
-                console.error("Error fetching overview data:", error);
                 toast.error(error.message);
                 setDashboardData(prev => ({ ...prev, loading: false, error: error.message }));
             }

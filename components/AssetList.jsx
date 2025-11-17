@@ -56,7 +56,6 @@ const AssetList = ({ orgId }) => {
             setAssignments(assignmentsData);
             setMembers(membersData);
         } catch (error) {
-            console.error("Error fetching asset data:", error);
             toast.error(error.message || "An error occurred while fetching data.");
         } finally {
             setLoading(false);
@@ -87,7 +86,6 @@ const AssetList = ({ orgId }) => {
     };
     
     const handleDelete = async (assetId) => {
-        console.log(assetId);
         if (!window.confirm("Are you sure you want to delete this asset? This action cannot be undone.")) return;
         try {
             const response = await fetch(`/api/org/${orgId}/assets/${assetId}`, { method: 'DELETE' });

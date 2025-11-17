@@ -1,8 +1,7 @@
 "use client";
 
-import { Home, ListChecks, Wrench, Users, Settings, BarChart, Package } from 'lucide-react';
+import { Home, ListChecks, Wrench, Users, BarChart, Package } from 'lucide-react';
 import { Fragment } from 'react';
-import Link from 'next/link';
 
 const Sidebar = ({ isOpen, onClose, onViewChange, activeIdx, isAdmin }) => {
 
@@ -33,7 +32,7 @@ const Sidebar = ({ isOpen, onClose, onViewChange, activeIdx, isAdmin }) => {
                         {navItems.map((item) => (
                             <button 
                                 key={item.label}
-                                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full text-left
+                                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full text-left cursor-pointer
                                     ${activeIdx === item.idx
                                         ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white' 
                                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'}`

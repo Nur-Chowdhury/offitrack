@@ -58,8 +58,6 @@ export async function PUT(request, context) {
         }
         return Response.json(updatedLog, { status: 200 });
     } catch (e) {
-        console.log(e);
-        
         return Response.json({ error: "Failed to assign staff." }, { status: 500 });
     }
 }

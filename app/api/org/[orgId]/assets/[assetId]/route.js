@@ -46,7 +46,6 @@ export async function PUT(req, context) {
 
 export async function DELETE(req, context) {
     const { orgId, assetId } = await context.params;
-    console.log(orgId, assetId);
     
     const { error, status, membership } = await authorizeAndGetMembership(orgId);
 
@@ -73,8 +72,6 @@ export async function DELETE(req, context) {
         });
         return Response.json({ message: "Asset deleted successfully" }, { status: 200 });
     } catch (e) {
-        console.log(e);
-        
         return Response.json({ error: "Asset not found" }, { status: 404 });
     }
 }

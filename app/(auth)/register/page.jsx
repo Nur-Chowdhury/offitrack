@@ -56,7 +56,6 @@ const page = () => {
                         setUsernameStatus({ loading: false, message: 'Could not check username.', isAvailable: false });
                     }
                 } catch (error) {
-                    console.log(error);
                     setUsernameStatus({ loading: false, message: 'Error checking username.', isAvailable: false });
                 }
             };

@@ -71,7 +71,6 @@ const MaintenanceDashboard = ({ orgId }) => {
         }
         const isAdmin = currentUserMembership.role === 'ADMIN';
         const isStaff = currentUserMembership.role === 'MAINTENANCE_STAFF';
-        console.log(isAdmin, isStaff);
         if (isStaff && !isAdmin) {
             return logs.filter(log => log.maintainedById === session.user.id && log.status !== 'COMPLETED');
         }

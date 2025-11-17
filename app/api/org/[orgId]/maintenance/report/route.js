@@ -76,7 +76,6 @@ export async function POST(request, context) {
 
         return Response.json(newLog, { status: 201 });
     } catch (e) {
-        console.error(e);
         return Response.json({ error: "Failed to report issue." }, { status: 500 });
     }
 }

@@ -1,4 +1,3 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -6,15 +5,6 @@ import { AuthProvider } from "./AuthProvider";
 import { Provider } from "./Provider";
 import { Inter } from 'next/font/google';
 
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {

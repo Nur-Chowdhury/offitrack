@@ -13,12 +13,10 @@ export async function POST(request, context) {
     if (asset.condition !== 'GOOD' && asset.condition !== 'NEW' && asset.condition !== 'USED') {
         return Response.json({ error: `This asset is currently ${asset.condition.toLowerCase()} and cannot be requested.` }, { status: 409 });
     }
-    console.log(membership.userId);
     const member = await prisma.user.findUnique({where: {id: membership.userId}})
     try {
         const { notes } = await request.json();
         const isAdmin = membership.role === UserRole.ADMIN;
-        console.log(notes, isAdmin, orgId, assetId);
         if (isAdmin) {
             const result = await prisma.$transaction(async (tx) => {
                 const adminAssignment = await tx.assetAssignment.create({
@@ -42,7 +40,6 @@ export async function POST(request, context) {
                 });
                 return adminAssignment;
             });
-            console.log(result);
             return Response.json(result, { status: 201 });
         }
         const newAssignmentRequest = await prisma.assetAssignment.create({

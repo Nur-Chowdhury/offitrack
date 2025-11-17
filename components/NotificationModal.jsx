@@ -23,14 +23,10 @@ const NotificationModal = ({ isOpen, onClose, orgId }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // --- THIS LOGIC IS NOW SIMPLIFIED ---
         if (isOpen && orgId) {
             const fetchNotifications = async () => {
                 setLoading(true);
                 try {
-                    // The modal's only job now is to FETCH the notification list.
-                    // The "mark-seen" action is handled by the parent component (`Overview`)
-                    // when the modal is closed, which is a more robust pattern.
                     const response = await fetch(`/api/org/${orgId}/notifications`);
                     if (!response.ok) throw new Error("Failed to fetch notifications.");
                     setNotifications(await response.json());

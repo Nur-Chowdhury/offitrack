@@ -33,7 +33,7 @@ export async function PUT(request, context) {
                     where: { id: logToComplete.resourceId }, 
                     data: { condition: AssetCondition.GOOD } 
                 });
-                itemName = resource.itemName;
+                itemName = resource.name;
             }
             if (logToComplete.reportedById) {
                 await createNotification(tx, orgId, logToComplete.reportedById, `The maintenance issue for "${itemName}" has been resolved.`);
@@ -57,8 +57,6 @@ export async function PUT(request, context) {
 
         return Response.json(completedLog, { status: 200 });
     } catch (e) {
-        console.log(e);
-        
         return Response.json({ error: "Failed to complete task." }, { status: 500 });
     }
 }

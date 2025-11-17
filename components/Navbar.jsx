@@ -57,9 +57,11 @@ const Navbar = ({ onMenuClick }) => {
                                     <span className="block text-md">{session?.user?.name}</span>
                                     <span className="block text-sm text-gray-400">@{session?.user?.username}</span>
                                 </div>
-                                <div className="border-t border-gray-700 dark:border-gray-300 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-900 px-4 py-1">
-                                    <span className=' block text-md font-light'>Profile</span>
-                                </div>
+                                <Link href="/profile">
+                                    <div className=" border-t border-gray-700 dark:border-gray-300 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-900 px-4 py-1">
+                                        <span className=' block text-md font-light'>Profile</span>
+                                    </div>
+                                </Link>
                                 <div 
                                     className="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-900 px-4 py-1"
                                     onClick={() => signOut({ callbackUrl: '/login' })}

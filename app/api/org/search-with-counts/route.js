@@ -33,7 +33,6 @@ export async function GET(request) {
 
         return Response.json(organizations, { status: 200 });
     } catch (error) {
-        console.error("Error fetching organizations with counts:", error);
         return Response.json({ error: "Server error" }, { status: 500 });
     }
 }

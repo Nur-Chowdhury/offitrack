@@ -47,7 +47,6 @@ const ResourceList = ({ orgId }) => {
             setBookings(bookingsData);
             setMembers(membersData);
         } catch (error) {
-            console.error("Error fetching resource data:", error);
             toast.error(error.message || "An error occurred while fetching data.");
         } finally {
             setLoading(false);

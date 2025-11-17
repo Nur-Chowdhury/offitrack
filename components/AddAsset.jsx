@@ -93,7 +93,7 @@ const AddAsset = ({ isOpen, onClose, onSuccess, orgId }) => {
                                 value={purchaseDate} 
                                 onChange={(e) => setPurchaseDate(e.target.value)} 
                                 required 
-                                className="w-full p-2.5 text-sm rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
+                                className="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
                             />
                         </div>
                         <div>
@@ -116,14 +116,14 @@ const AddAsset = ({ isOpen, onClose, onSuccess, orgId }) => {
                         <button 
                             type="button" 
                             onClick={handleClose} 
-                            className="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-lg"
+                            className="px-4 py-2 text-sm font-medium text-red-500 bg-white border border-gray-200 rounded-lg"
                         >
                             Cancel
                         </button>
                         <button 
                             type="submit" 
                             disabled={isCreating} 
-                            className="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 disabled:opacity-50"
+                            className="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 disabled:opacity-50 cursor-pointer"
                         >
                             {isCreating ? 'Creating...' : 'Create Asset'}
                         </button>

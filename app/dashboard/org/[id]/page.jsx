@@ -44,7 +44,6 @@ const Page = () => {
             const membersData = await membersRes.json();
             setMembers(membersData);
         } catch (error) {
-            console.error("Error fetching member data:", error);
             toast.error(error.message || "An error occurred while fetching data.");
         } finally {
             setLoading(false);

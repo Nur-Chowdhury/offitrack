@@ -73,8 +73,6 @@ const Reports = ({ orgId }) => {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('asset_usage');
     const [reportData, setReportData] = useState([]);
-    console.log("hi");
-    
 
     const reportTypes = [
         { id: 'asset_usage', label: 'Asset Usage', icon: <ListChecks size={16}/> },

@@ -15,10 +15,7 @@ export async function GET(request, context) {
             maintainedBy: { select: { name: true } },
         },
         orderBy: { createdAt: 'desc' }
-    });
-
-    console.log(orgId, logs);
-    
+    });    
 
     return Response.json(logs, { status: 200 });
 }

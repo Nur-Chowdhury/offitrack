@@ -66,7 +66,6 @@ export async function GET(request, context) {
 
         return Response.json(data, { status: 200 });
     } catch (e) {
-        console.error(`Error generating report type '${type}':`, e);
         return Response.json({ error: `Failed to generate report: ${type}` }, { status: 500 });
     }
 }

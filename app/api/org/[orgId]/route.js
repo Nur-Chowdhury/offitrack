@@ -1,7 +1,6 @@
 import { authorizeAndGetMembership } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
-// GET a single organization's details
 export async function GET(request, context) {
     const { orgId } = await context.params;
 

@@ -13,7 +13,6 @@ const BookResource = ({ isOpen, onClose, onSuccess, orgId, resource, isAdmin }) 
         e.preventDefault();
         setError(null);
 
-        // Client-side validation
         if (new Date(startTime) >= new Date(endTime)) {
             const validationError = "End time must be after the start time.";
             setError(validationError);

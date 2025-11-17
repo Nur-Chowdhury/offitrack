@@ -4,9 +4,8 @@ import prisma from "@/lib/prisma";
 export async function GET(request, context) {
     const { orgId } = await context.params;
     const { searchParams } = new URL(request.url);
-    const timeframe = searchParams.get('timeframe') || '24h'; // Default to 24h
+    const timeframe = searchParams.get('timeframe') || '24h';
 
-    // --- Authorization ---
     const { error, status } = await authorizeAndGetMembership(orgId);
     if (error) return Response.json({ error }, { status });
 
@@ -15,30 +14,27 @@ export async function GET(request, context) {
         let startDate;
         let interval;
 
-        // --- Determine timeframe & interval ---
         switch (timeframe) {
             case '1h':
-                startDate = new Date(now.getTime() - 1 * 60 * 60 * 1000); // 1 hour
+                startDate = new Date(now.getTime() - 1 * 60 * 60 * 1000);
                 interval = 'minute';
                 break;
             case '24h':
-                startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000); // 24 hours
+                startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
                 interval = 'hour';
                 break;
             case '7d':
             default:
-                startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 7 days
+                startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
                 interval = 'day';
                 break;
         }
 
-        // --- Safety check for SQL injection (interval is hardcoded anyway) ---
         const allowedIntervals = ['minute', 'hour', 'day'];
         if (!allowedIntervals.includes(interval)) {
             return Response.json({ error: "Invalid interval" }, { status: 400 });
         }
 
-        // --- Fetch overall counts ---
         const [totalMembers, totalAssets, totalResources, orgData] = await Promise.all([
             prisma.organizationMembership.count({ where: { organizationId: orgId } }),
             prisma.asset.count({ where: { organizationId: orgId } }),
@@ -49,7 +45,6 @@ export async function GET(request, context) {
             }),
         ]);
 
-        // --- Fetch time-series data ---
         const [recentAssignments, recentBookings, recentMaintenance, recentMembers] = await Promise.all([
             prisma.$queryRawUnsafe(
                 `SELECT DATE_TRUNC('${interval}', "createdAt") AS period, COUNT(*)::int 
@@ -82,7 +77,6 @@ export async function GET(request, context) {
             ),
         ]);
 
-        // --- Combine assignment + booking history ---
         const combinedHistory = {};
         [...recentAssignments, ...recentBookings].forEach(row => {
             const periodKey = new Date(row.period).toISOString();
@@ -92,13 +86,11 @@ export async function GET(request, context) {
             combinedHistory[periodKey].count += row.count;
         });
 
-        // --- Compute totals ---
         const totalRecentAssignments = recentAssignments.reduce((sum, r) => sum + r.count, 0);
         const totalRecentBookings = recentBookings.reduce((sum, r) => sum + r.count, 0);
         const totalRecentMaintenance = recentMaintenance.reduce((sum, r) => sum + r.count, 0);
         const totalRecentMembers = recentMembers.reduce((sum, r) => sum + r.count, 0);
 
-        // --- Build response object ---
         const response = {
             orgName: orgData?.name || "Unknown Organization",
             totals: {
@@ -126,7 +118,6 @@ export async function GET(request, context) {
         return Response.json(response, { status: 200 });
 
     } catch (e) {
-        console.error(e);
         return Response.json(
             { error: "Failed to fetch dashboard statistics." },
             { status: 500 }

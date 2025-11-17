@@ -6,7 +6,7 @@ import { useGSAP } from '@gsap/react'
 import Image from 'next/image';
 
 
-export default function Home() {
+export default function Home() { 
 
   const heroRef = useRef(null);
   const navRef = useRef(null);

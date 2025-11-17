@@ -17,13 +17,23 @@ export async function PUT(request, context) {
 
     try {
         const { cost, details } = await request.json();
+
+        let itemName;
         
         const completedLog = await prisma.$transaction(async (tx) => {
             if (logToComplete.assetId) {
-                await tx.asset.update({ where: { id: logToComplete.assetId }, data: { condition: AssetCondition.GOOD } });
+                const asset = await tx.asset.update({ 
+                    where: { id: logToComplete.assetId }, 
+                    data: { condition: AssetCondition.GOOD } 
+                });
+                itemName = asset.name;
             }
             if (logToComplete.resourceId) {
-                await tx.resource.update({ where: { id: logToComplete.resourceId }, data: { condition: AssetCondition.GOOD } });
+                const resource = await tx.resource.update({ 
+                    where: { id: logToComplete.resourceId }, 
+                    data: { condition: AssetCondition.GOOD } 
+                });
+                itemName = resource.itemName;
             }
             if (logToComplete.reportedById) {
                 await createNotification(tx, orgId, logToComplete.reportedById, `The maintenance issue for "${itemName}" has been resolved.`);
@@ -47,6 +57,8 @@ export async function PUT(request, context) {
 
         return Response.json(completedLog, { status: 200 });
     } catch (e) {
+        console.log(e);
+        
         return Response.json({ error: "Failed to complete task." }, { status: 500 });
     }
 }

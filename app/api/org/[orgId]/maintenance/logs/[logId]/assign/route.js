@@ -16,12 +16,22 @@ export async function PUT(request, context) {
         const logToUpdate = await prisma.maintenanceLog.findUnique({ where: { id: logId } });
         if (!logToUpdate) return Response.json({ error: "Log not found." }, { status: 404 });
         
+        let itemName = '';
+
         const updatedLog = await prisma.$transaction(async (tx) => {
             if (logToUpdate.assetId) {
-                await tx.asset.update({ where: { id: logToUpdate.assetId }, data: { condition: AssetCondition.IN_REPAIR } });
+                const asset =  await tx.asset.update({
+                    where: { id: logToUpdate.assetId }, 
+                    data: { condition: AssetCondition.IN_REPAIR } 
+                });
+                itemName = asset.name;
             }
             if (logToUpdate.resourceId) {
-                await tx.resource.update({ where: { id: logToUpdate.resourceId }, data: { condition: AssetCondition.IN_REPAIR } });
+                const resource = await tx.resource.update({ 
+                    where: { id: logToUpdate.resourceId }, 
+                    data: { condition: AssetCondition.IN_REPAIR } 
+                });
+                itemName = resource.name;
             }
             return tx.maintenanceLog.update({
                 where: { id: logId },
@@ -48,6 +58,8 @@ export async function PUT(request, context) {
         }
         return Response.json(updatedLog, { status: 200 });
     } catch (e) {
+        console.log(e);
+        
         return Response.json({ error: "Failed to assign staff." }, { status: 500 });
     }
 }

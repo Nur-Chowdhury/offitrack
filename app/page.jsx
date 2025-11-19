@@ -4,12 +4,23 @@ import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useGSAP } from '@gsap/react'
 import Image from 'next/image';
+import { useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation';
 
 
 export default function Home() { 
 
   const heroRef = useRef(null);
   const navRef = useRef(null);
+
+  const { status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard"); 
+    }
+  }, [status, router]);
 
   useGSAP(() => {
     const ctx = gsap.context(() => {
